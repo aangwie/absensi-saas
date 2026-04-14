@@ -69,13 +69,15 @@
                         <th class="text-center py-3 px-3 text-xs font-semibold text-slate-500 uppercase">Waktu</th>
                         <th class="text-left py-3 px-3 text-xs font-semibold text-slate-500 uppercase">Lokasi</th>
                         <th class="text-center py-3 px-3 text-xs font-semibold text-slate-500 uppercase">Jarak</th>
+                        <th class="text-center py-3 px-3 text-xs font-semibold text-slate-500 uppercase">Akurasi</th>
                         <th class="text-center py-3 px-3 text-xs font-semibold text-slate-500 uppercase">Status</th>
+                        <th class="text-center py-3 px-3 text-xs font-semibold text-slate-500 uppercase">Device</th>
                         <th class="text-center py-3 px-3 text-xs font-semibold text-slate-500 uppercase">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                     @forelse($attendances as $i => $att)
-                    <tr class="hover:bg-slate-50/50 transition-colors">
+                    <tr class="hover:bg-slate-50/50 transition-colors {{ $att->is_mock_suspected ? 'bg-red-50/50' : '' }}">
                         <td class="py-3 px-3 text-slate-500">{{ $attendances->firstItem() + $i }}</td>
                         <td class="py-3 px-3">
                             <p class="font-semibold text-slate-800">{{ $att->attendee_name }}</p>
@@ -94,10 +96,26 @@
                         <td class="py-3 px-3 text-center text-slate-600 font-mono text-xs">{{ \Carbon\Carbon::parse($att->checked_at)->format('H:i:s') }}</td>
                         <td class="py-3 px-3 text-slate-600 text-xs">{{ $att->location?->name ?? '-' }}</td>
                         <td class="py-3 px-3 text-center text-xs text-slate-600">{{ round($att->distance_meters) }}m</td>
+                        <td class="py-3 px-3 text-center text-xs text-slate-600">{{ $att->accuracy ? round($att->accuracy, 1) . 'm' : '-' }}</td>
                         <td class="py-3 px-3 text-center">
-                            <span class="inline-flex px-2 py-1 rounded-full text-[10px] font-bold {{ $att->status === 'on_time' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }}">
-                                {{ $att->status === 'on_time' ? 'Tepat' : 'Telat' }}
-                            </span>
+                            @if($att->is_mock_suspected)
+                                <span class="inline-flex px-2 py-1 rounded-full text-[10px] font-bold bg-red-100 text-red-700" title="{{ $att->mock_reasons }}">
+                                    ⚠ Mock
+                                </span>
+                            @else
+                                <span class="inline-flex px-2 py-1 rounded-full text-[10px] font-bold {{ $att->status === 'on_time' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }}">
+                                    {{ $att->status === 'on_time' ? 'Tepat' : 'Telat' }}
+                                </span>
+                            @endif
+                        </td>
+                        <td class="py-3 px-3 text-center">
+                            @if($att->user_agent)
+                                <span class="inline-flex px-2 py-0.5 rounded-lg text-[10px] font-medium {{ str_contains($att->user_agent ?? '', 'Mobile') ? 'bg-sky-50 text-sky-600' : 'bg-slate-100 text-slate-500' }}" title="{{ $att->user_agent }}">
+                                    {{ str_contains($att->user_agent ?? '', 'Mobile') ? '📱 Mobile' : '💻 Desktop' }}
+                                </span>
+                            @else
+                                <span class="text-[10px] text-slate-400">-</span>
+                            @endif
                         </td>
                         <td class="py-3 px-3 text-center">
                             <form id="delete-att-{{ $att->id }}" method="POST" action="{{ route('admin.attendances.destroy', $att) }}">@csrf @method('DELETE')</form>
@@ -107,7 +125,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="9" class="py-12 text-center text-slate-400">Belum ada data absensi untuk tanggal ini</td></tr>
+                    <tr><td colspan="11" class="py-12 text-center text-slate-400">Belum ada data absensi untuk tanggal ini</td></tr>
                     @endforelse
                 </tbody>
             </table>

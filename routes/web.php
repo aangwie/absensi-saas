@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\AttendanceController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\MobileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,6 +20,18 @@ use Illuminate\Support\Facades\Route;
 // Redirect root to login or dashboard
 Route::get('/', function () {
     return auth()->check() ? redirect()->route('admin.dashboard') : redirect()->route('login');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Mobile Attendance Routes (Chrome Mobile)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('m')->group(function () {
+    Route::get('/login', [MobileController::class, 'loginPage'])->name('mobile.login');
+    Route::post('/login', [MobileController::class, 'login'])->name('mobile.login.submit');
+    Route::get('/dashboard', [MobileController::class, 'dashboard'])->name('mobile.dashboard');
+    Route::post('/logout', [MobileController::class, 'logout'])->name('mobile.logout');
 });
 
 // Auth Routes

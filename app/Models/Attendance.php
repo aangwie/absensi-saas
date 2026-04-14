@@ -15,7 +15,11 @@ class Attendance extends Model
         'latitude',
         'longitude',
         'distance_meters',
+        'accuracy',
         'device_id',
+        'is_mock_suspected',
+        'mock_reasons',
+        'user_agent',
         'type',
         'status',
         'notes',
@@ -26,6 +30,8 @@ class Attendance extends Model
         'latitude' => 'decimal:7',
         'longitude' => 'decimal:7',
         'distance_meters' => 'float',
+        'accuracy' => 'float',
+        'is_mock_suspected' => 'boolean',
         'checked_at' => 'datetime',
     ];
 

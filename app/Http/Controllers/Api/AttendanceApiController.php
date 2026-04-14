@@ -29,7 +29,29 @@ class AttendanceApiController extends Controller
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'device_id' => 'nullable|string',
+            'accuracy' => 'nullable|numeric',
+            'is_mock_suspected' => 'nullable|boolean',
+            'mock_reasons' => 'nullable|string|max:1000',
         ]);
+
+        // Mock location check — reject if fake GPS detected
+        if ($request->boolean('is_mock_suspected')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Fake GPS terdeteksi! Anda tidak diizinkan melakukan absensi dengan lokasi palsu.',
+                'data' => [
+                    'mock_reasons' => $request->mock_reasons,
+                ],
+            ], 403);
+        }
+
+        // Reject suspiciously perfect accuracy (real GPS never gives 0)
+        if ($request->has('accuracy') && $request->accuracy !== null && $request->accuracy < 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akurasi GPS tidak valid. Pastikan Anda tidak menggunakan lokasi palsu.',
+            ], 403);
+        }
 
         $user = $request->user();
         $school = $user->school;
@@ -82,7 +104,7 @@ class AttendanceApiController extends Controller
         $lateThreshold = Carbon::parse($school->late_threshold);
         $status = $now->format('H:i:s') <= $lateThreshold->format('H:i:s') ? 'on_time' : 'late';
 
-        // Save attendance
+        // Save attendance with mock detection data
         $attendance = Attendance::create([
             'school_id' => $school->id,
             'attendee_type' => get_class($user),
@@ -91,7 +113,11 @@ class AttendanceApiController extends Controller
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
             'distance_meters' => $result['distance'],
+            'accuracy' => $request->accuracy,
             'device_id' => $request->device_id ?? $user->device_id,
+            'is_mock_suspected' => false,
+            'mock_reasons' => $request->mock_reasons,
+            'user_agent' => $request->userAgent(),
             'type' => 'check_in',
             'status' => $status,
             'checked_at' => $now,
@@ -124,7 +150,26 @@ class AttendanceApiController extends Controller
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'device_id' => 'nullable|string',
+            'accuracy' => 'nullable|numeric',
+            'is_mock_suspected' => 'nullable|boolean',
+            'mock_reasons' => 'nullable|string|max:1000',
         ]);
+
+        // Mock location check — reject if fake GPS detected
+        if ($request->boolean('is_mock_suspected')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Fake GPS terdeteksi! Anda tidak diizinkan melakukan absensi dengan lokasi palsu.',
+            ], 403);
+        }
+
+        // Reject suspiciously perfect accuracy
+        if ($request->has('accuracy') && $request->accuracy !== null && $request->accuracy < 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akurasi GPS tidak valid. Pastikan Anda tidak menggunakan lokasi palsu.',
+            ], 403);
+        }
 
         $user = $request->user();
         $school = $user->school;
@@ -189,7 +234,11 @@ class AttendanceApiController extends Controller
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
             'distance_meters' => $result['distance'],
+            'accuracy' => $request->accuracy,
             'device_id' => $request->device_id ?? $user->device_id,
+            'is_mock_suspected' => false,
+            'mock_reasons' => $request->mock_reasons,
+            'user_agent' => $request->userAgent(),
             'type' => 'check_out',
             'status' => 'on_time',
             'checked_at' => $now,
