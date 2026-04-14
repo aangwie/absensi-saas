@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
+class Teacher extends Authenticatable
+{
+    use HasApiTokens;
+
+    protected $fillable = [
+        'school_id',
+        'nip',
+        'name',
+        'subject',
+        'phone',
+        'password',
+        'device_id',
+        'is_active',
+    ];
+
+    protected $hidden = [
+        'password',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'password' => 'hashed',
+    ];
+
+    public function school(): BelongsTo
+    {
+        return $this->belongsTo(School::class);
+    }
+
+    public function attendances(): MorphMany
+    {
+        return $this->morphMany(Attendance::class, 'attendee');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+}

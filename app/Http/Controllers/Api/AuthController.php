@@ -1,0 +1,164 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Student;
+use App\Models\Teacher;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+
+class AuthController extends Controller
+{
+    /**
+     * Login for students using NISN
+     */
+    public function studentLogin(Request $request)
+    {
+        $request->validate([
+            'nisn' => 'required|string',
+            'password' => 'required|string',
+            'device_id' => 'nullable|string',
+        ]);
+
+        $student = Student::where('nisn', $request->nisn)->first();
+
+        if (!$student || !Hash::check($request->password, $student->password)) {
+            throw ValidationException::withMessages([
+                'nisn' => ['NISN atau password salah.'],
+            ]);
+        }
+
+        if (!$student->is_active) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akun siswa tidak aktif. Hubungi admin sekolah.',
+            ], 403);
+        }
+
+        // Update device_id if provided
+        if ($request->device_id) {
+            $student->update(['device_id' => $request->device_id]);
+        }
+
+        // Revoke previous tokens
+        $student->tokens()->delete();
+
+        $token = $student->createToken('student-token')->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Login berhasil',
+            'data' => [
+                'token' => $token,
+                'type' => 'student',
+                'user' => [
+                    'id' => $student->id,
+                    'nisn' => $student->nisn,
+                    'name' => $student->name,
+                    'class' => $student->class,
+                    'school' => $student->school->name,
+                    'school_id' => $student->school_id,
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * Login for teachers using NIP
+     */
+    public function teacherLogin(Request $request)
+    {
+        $request->validate([
+            'nip' => 'required|string',
+            'password' => 'required|string',
+            'device_id' => 'nullable|string',
+        ]);
+
+        $teacher = Teacher::where('nip', $request->nip)->first();
+
+        if (!$teacher || !Hash::check($request->password, $teacher->password)) {
+            throw ValidationException::withMessages([
+                'nip' => ['NIP atau password salah.'],
+            ]);
+        }
+
+        if (!$teacher->is_active) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akun guru tidak aktif. Hubungi admin sekolah.',
+            ], 403);
+        }
+
+        // Update device_id if provided
+        if ($request->device_id) {
+            $teacher->update(['device_id' => $request->device_id]);
+        }
+
+        // Revoke previous tokens
+        $teacher->tokens()->delete();
+
+        $token = $teacher->createToken('teacher-token')->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Login berhasil',
+            'data' => [
+                'token' => $token,
+                'type' => 'teacher',
+                'user' => [
+                    'id' => $teacher->id,
+                    'nip' => $teacher->nip,
+                    'name' => $teacher->name,
+                    'subject' => $teacher->subject,
+                    'school' => $teacher->school->name,
+                    'school_id' => $teacher->school_id,
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * Logout - revoke current token
+     */
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Logout berhasil',
+        ]);
+    }
+
+    /**
+     * Get current user profile
+     */
+    public function profile(Request $request)
+    {
+        $user = $request->user();
+        $type = $user instanceof Student ? 'student' : 'teacher';
+
+        $data = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'type' => $type,
+            'school' => $user->school->name,
+            'school_id' => $user->school_id,
+        ];
+
+        if ($type === 'student') {
+            $data['nisn'] = $user->nisn;
+            $data['class'] = $user->class;
+        } else {
+            $data['nip'] = $user->nip;
+            $data['subject'] = $user->subject;
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+        ]);
+    }
+}
