@@ -42,7 +42,7 @@
                 {{-- Schools --}}
                 <a href="{{ route('admin.schools.index') }}"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
-                                  {{ request()->routeIs('admin.schools.*') ? 'bg-white/15 text-white shadow-lg' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
+                                      {{ request()->routeIs('admin.schools.*') ? 'bg-white/15 text-white shadow-lg' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -95,7 +95,7 @@
                 {{-- Attendance Schedule --}}
                 <a href="{{ route('admin.attendance-schedule.index') }}"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
-                                  {{ request()->routeIs('admin.attendance-schedule.*') ? 'bg-white/15 text-white shadow-lg' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
+                                      {{ request()->routeIs('admin.attendance-schedule.*') ? 'bg-white/15 text-white shadow-lg' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -124,7 +124,7 @@
                 {{-- Users --}}
                 <a href="{{ route('admin.users.index') }}"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
-                                  {{ request()->routeIs('admin.users.*') ? 'bg-white/15 text-white shadow-lg' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
+                                      {{ request()->routeIs('admin.users.*') ? 'bg-white/15 text-white shadow-lg' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -144,7 +144,7 @@
                 {{-- Settings --}}
                 <a href="{{ route('admin.settings.index') }}"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
-                                  {{ request()->routeIs('admin.settings.*') ? 'bg-white/15 text-white shadow-lg' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
+                                      {{ request()->routeIs('admin.settings.*') ? 'bg-white/15 text-white shadow-lg' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
@@ -153,15 +153,15 @@
                 </a>
 
                 {{-- Attendance Schedule --}}
-                <a href="{{ route('admin.attendance-schedule.index') }}"
-                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
-                                  {{ request()->routeIs('admin.attendance-schedule.*') ? 'bg-white/15 text-white shadow-lg' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
-                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span x-show="sidebarOpen" x-transition class="text-sm font-medium">Jadwal Absensi</span>
-                </a>
+                <!--a href="{{ route('admin.attendance-schedule.index') }}"
+                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
+                                      {{ request()->routeIs('admin.attendance-schedule.*') ? 'bg-white/15 text-white shadow-lg' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span x-show="sidebarOpen" x-transition class="text-sm font-medium">Jadwal Absensi</span>
+                    </a-->
             @endif
         </nav>
 
