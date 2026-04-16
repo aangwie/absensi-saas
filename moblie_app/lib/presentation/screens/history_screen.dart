@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
-import 'package:intl/intl.dart';
 import '../../core/network/api_client.dart';
 import '../controllers/auth_controller.dart';
 
