@@ -9,10 +9,10 @@ class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
 
   @override
-  State<HistoryScreen> createState() => _HistoryScreenState();
+  State<HistoryScreen> createState() => HistoryScreenState();
 }
 
-class _HistoryScreenState extends State<HistoryScreen> {
+class HistoryScreenState extends State<HistoryScreen> {
   final ApiClient apiClient = ApiClient();
   final AuthController auth = Get.find<AuthController>();
   List<dynamic> attendances = [];
@@ -236,7 +236,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   Row(
                     children: [
                       Text(
-                        isCheckIn ? 'Check In' : 'Check Out',
+                        isCheckIn ? 'Absen Masuk' : 'Absen Pulang',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,

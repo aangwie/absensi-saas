@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
+import '../controllers/attendance_controller.dart';
 import 'attendance_screen.dart';
 import 'history_screen.dart';
 import 'login_screen.dart';
@@ -9,24 +10,50 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreen> createState() => HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   final AuthController auth = Get.find<AuthController>();
+  final GlobalKey<HistoryScreenState> _historyKey = GlobalKey<HistoryScreenState>();
 
-  final List<Widget> _screens = [
-    AttendanceScreen(),
-    const HistoryScreen(),
-  ];
+  /// Navigate to history tab and refresh it
+  void goToHistory() {
+    setState(() => _currentIndex = 1);
+    // Refresh history data
+    Future.delayed(const Duration(milliseconds: 300), () {
+      _historyKey.currentState?.fetchHistory();
+    });
+  }
+
+  /// Refresh all data in the app
+  void refreshAll() async {
+    // Refresh attendance controller data
+    if (Get.isRegistered<AttendanceController>()) {
+      final ctrl = Get.find<AttendanceController>();
+      await ctrl.initData();
+    }
+    // Refresh history if on history tab
+    _historyKey.currentState?.fetchHistory();
+
+    Get.snackbar(
+      'Berhasil 🔄',
+      'Data berhasil diperbarui dari server.',
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 2),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
-        children: _screens,
+        children: [
+          AttendanceScreen(),
+          HistoryScreen(key: _historyKey),
+        ],
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
@@ -46,11 +73,18 @@ class _HomeScreenState extends State<HomeScreen> {
           child: BottomNavigationBar(
             currentIndex: _currentIndex,
             onTap: (index) {
-              if (index == 2) {
-                // Logout
+              if (index == 3) {
                 _showLogoutDialog();
+              } else if (index == 2) {
+                refreshAll();
               } else {
                 setState(() => _currentIndex = index);
+                // Auto-refresh history when switching to history tab
+                if (index == 1) {
+                  Future.delayed(const Duration(milliseconds: 200), () {
+                    _historyKey.currentState?.fetchHistory();
+                  });
+                }
               }
             },
             type: BottomNavigationBarType.fixed,
@@ -68,6 +102,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Icon(Icons.history),
                 activeIcon: Icon(Icons.history, size: 28),
                 label: 'Riwayat',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.refresh, color: Colors.green),
+                label: 'Refresh',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.logout, color: Colors.red),

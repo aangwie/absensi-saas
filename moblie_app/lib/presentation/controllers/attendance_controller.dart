@@ -8,6 +8,9 @@ class AttendanceController extends GetxController {
   final ApiClient apiClient = ApiClient();
   final LocationService locationService = LocationService();
 
+  /// Callback triggered after successful attendance (check-in or check-out)
+  Function? onAttendanceSuccess;
+
   var isLoading = false.obs;
   var isLocationReady = false.obs;
   var distanceInMeters = 0.0.obs;
@@ -241,6 +244,8 @@ class AttendanceController extends GetxController {
         hasCheckedIn.value = true;
         Get.snackbar('Sukses ✅', message);
         await fetchTodayStatus();
+        // Navigate to history
+        onAttendanceSuccess?.call();
       }
     } catch (e) {
       _handleError(e, 'Absen Masuk Gagal');
@@ -277,6 +282,8 @@ class AttendanceController extends GetxController {
         hasCheckedOut.value = true;
         Get.snackbar('Sukses ✅', message);
         await fetchTodayStatus();
+        // Navigate to history
+        onAttendanceSuccess?.call();
       }
     } catch (e) {
       _handleError(e, 'Absen Pulang Gagal');

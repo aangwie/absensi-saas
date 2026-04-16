@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import '../controllers/attendance_controller.dart';
 import '../controllers/auth_controller.dart';
+import 'home_screen.dart';
 
 class AttendanceScreen extends StatelessWidget {
   AttendanceScreen({super.key});
@@ -12,8 +13,16 @@ class AttendanceScreen extends StatelessWidget {
   final AuthController auth = Get.find<AuthController>();
   final MapController mapController = MapController();
 
+  void _setupCallback(BuildContext context) {
+    ctrl.onAttendanceSuccess ??= () {
+      final homeState = context.findAncestorStateOfType<HomeScreenState>();
+      homeState?.goToHistory();
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
+    _setupCallback(context);
     return Scaffold(
       body: Obx(() {
         if (ctrl.isLoading.value && !ctrl.isLocationReady.value) {
