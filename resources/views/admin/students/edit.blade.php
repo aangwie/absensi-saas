@@ -44,7 +44,7 @@
                             {{ ucfirst($student->verification_status) }}
                         </span>
                         @if($student->verifiedByUser)
-                         oleh {{ $student->verifiedByUser->name }} pada {{ \Carbon\Carbon::parse($student->verified_at)->format('d M Y H:i') }}
+                         oleh {{ $student->verifiedByUser->name }} pada {{ \Carbon\Carbon::parse($student->verified_at)->format('d/m/Y H:i') }}
                         @endif
                     </p>
                 </div>

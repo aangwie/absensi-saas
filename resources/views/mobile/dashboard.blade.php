@@ -397,7 +397,7 @@
                     </div>
                     <div class="history-meta">
                         <div class="history-time">{{ \Carbon\Carbon::parse($item->checked_at)->format('H:i') }}</div>
-                        <div class="history-date">{{ \Carbon\Carbon::parse($item->checked_at)->format('d M') }}</div>
+                        <div class="history-date">{{ \Carbon\Carbon::parse($item->checked_at)->format('d/m/Y') }}</div>
                         @if($item->type === 'check_in')
                             <div class="history-badge {{ $item->status === 'on_time' ? 'badge-on-time' : 'badge-late' }}">
                                 {{ $item->status === 'on_time' ? 'Tepat' : 'Telat' }}

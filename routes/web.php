@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\AttendanceController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\MobileController;
 use Illuminate\Support\Facades\Route;
 
@@ -67,4 +68,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'tenant'])->group(fu
 
     // Users (admin & super_admin)
     Route::resource('users', UserController::class)->middleware('role:super_admin,admin');
+
+    // Settings (super_admin only)
+    Route::prefix('settings')->name('settings.')->middleware('role:super_admin')->group(function () {
+        Route::get('/', [SettingController::class, 'index'])->name('index');
+        Route::post('/update-token', [SettingController::class, 'updateToken'])->name('update-token');
+        Route::post('/git-pull', [SettingController::class, 'gitPull'])->name('git-pull');
+        Route::post('/clear-cache', [SettingController::class, 'clearCache'])->name('clear-cache');
+        Route::post('/clear-config', [SettingController::class, 'clearConfig'])->name('clear-config');
+        Route::post('/migrate', [SettingController::class, 'migrate'])->name('migrate');
+    });
 });
