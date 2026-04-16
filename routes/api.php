@@ -29,4 +29,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/history', [AttendanceApiController::class, 'history']);
         Route::get('/today', [AttendanceApiController::class, 'todayStatus']);
     });
+
+    // School Locations & Schedule
+    Route::get('/school/locations', [AttendanceApiController::class, 'schoolLocations']);
+    Route::get('/school/schedule', [AttendanceApiController::class, 'todaySchedule']);
 });

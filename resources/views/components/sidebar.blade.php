@@ -107,6 +107,14 @@
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
                 <span x-show="sidebarOpen" x-transition class="text-sm font-medium">Pengaturan Sistem</span>
             </a>
+
+            {{-- Attendance Schedule --}}
+            <a href="{{ route('admin.attendance-schedule.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
+                      {{ request()->routeIs('admin.attendance-schedule.*') ? 'bg-white/15 text-white shadow-lg' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span x-show="sidebarOpen" x-transition class="text-sm font-medium">Jadwal Absensi</span>
+            </a>
             @endif
         </nav>
 

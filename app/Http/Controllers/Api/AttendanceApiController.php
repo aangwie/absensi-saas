@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
+use App\Models\AttendanceSchedule;
 use App\Models\Location;
 use App\Models\Student;
 use App\Models\Teacher;
@@ -55,6 +56,19 @@ class AttendanceApiController extends Controller
 
         $user = $request->user();
         $school = $user->school;
+
+        // Check attendance schedule time window
+        $schedule = AttendanceSchedule::getTodaySchedule($school->id);
+        if ($schedule) {
+            if (!$schedule->isWithinCheckInWindow()) {
+                $window = $schedule->check_in_window;
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Waktu absen masuk telah habis. Jadwal absen masuk hari ini: ' . $window,
+                    'data' => ['schedule' => $window],
+                ], 403);
+            }
+        }
 
         // Check if already checked in today
         $existingCheckIn = Attendance::where('attendee_type', get_class($user))
@@ -173,6 +187,19 @@ class AttendanceApiController extends Controller
 
         $user = $request->user();
         $school = $user->school;
+
+        // Check attendance schedule time window
+        $schedule = AttendanceSchedule::getTodaySchedule($school->id);
+        if ($schedule) {
+            if (!$schedule->isWithinCheckOutWindow()) {
+                $window = $schedule->check_out_window;
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Waktu absen pulang telah habis. Jadwal absen pulang hari ini: ' . $window,
+                    'data' => ['schedule' => $window],
+                ], 403);
+            }
+        }
 
         // Check if already checked out today
         $existingCheckOut = Attendance::where('attendee_type', get_class($user))
@@ -309,6 +336,78 @@ class AttendanceApiController extends Controller
                     'time' => Carbon::parse($checkOut->checked_at)->format('H:i:s'),
                     'location' => $checkOut->location?->name,
                 ] : null,
+            ],
+        ]);
+    }
+
+    /**
+     * Get school locations for the authenticated user
+     */
+    public function schoolLocations(Request $request)
+    {
+        $user = $request->user();
+        $school = $user->school;
+
+        $locations = Location::where('school_id', $school->id)
+            ->active()
+            ->get(['id', 'name', 'latitude', 'longitude', 'radius_max']);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'school_name' => $school->name,
+                'locations' => $locations->map(function ($loc) {
+                    return [
+                        'id' => $loc->id,
+                        'name' => $loc->name,
+                        'latitude' => (float) $loc->latitude,
+                        'longitude' => (float) $loc->longitude,
+                        'radius' => $loc->radius_max,
+                    ];
+                }),
+            ],
+        ]);
+    }
+
+    /**
+     * Get today's attendance schedule for the authenticated user's school
+     */
+    public function todaySchedule(Request $request)
+    {
+        $user = $request->user();
+        $school = $user->school;
+        $schedule = AttendanceSchedule::getTodaySchedule($school->id);
+        $dayNames = AttendanceSchedule::$dayNames;
+        $todayDay = now()->dayOfWeek;
+
+        if (!$schedule) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'day' => $dayNames[$todayDay] ?? '-',
+                    'has_schedule' => false,
+                    'message' => 'Tidak ada jadwal absensi untuk hari ini.',
+                ],
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'day' => $dayNames[$todayDay] ?? '-',
+                'has_schedule' => true,
+                'is_active' => $schedule->is_active,
+                'check_in' => [
+                    'start' => $schedule->check_in_start ? substr($schedule->check_in_start, 0, 5) : null,
+                    'end' => $schedule->check_in_end ? substr($schedule->check_in_end, 0, 5) : null,
+                    'is_open' => $schedule->isWithinCheckInWindow(),
+                ],
+                'check_out' => [
+                    'start' => $schedule->check_out_start ? substr($schedule->check_out_start, 0, 5) : null,
+                    'end' => $schedule->check_out_end ? substr($schedule->check_out_end, 0, 5) : null,
+                    'is_open' => $schedule->isWithinCheckOutWindow(),
+                ],
+                'server_time' => now()->format('H:i'),
             ],
         ]);
     }
