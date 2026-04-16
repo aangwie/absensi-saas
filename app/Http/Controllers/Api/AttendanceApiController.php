@@ -80,7 +80,7 @@ class AttendanceApiController extends Controller
         if ($existingCheckIn) {
             return response()->json([
                 'success' => false,
-                'message' => 'Anda sudah melakukan check-in hari ini pada pukul ' . Carbon::parse($existingCheckIn->checked_at)->format('H:i'),
+                'message' => 'Anda sudah melakukan absen masuk hari ini pada pukul ' . Carbon::parse($existingCheckIn->checked_at)->timezone('Asia/Jakarta')->format('H:i') . ' WIB',
             ], 422);
         }
 
@@ -141,7 +141,7 @@ class AttendanceApiController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Check-in berhasil! Status: ' . ($status === 'on_time' ? 'Tepat Waktu' : 'Terlambat'),
+            'message' => 'Absen masuk berhasil! Status: ' . ($status === 'on_time' ? 'Tepat Waktu' : 'Terlambat'),
             'data' => [
                 'attendance_id' => $attendance->id,
                 'name' => $user->name,
@@ -211,7 +211,7 @@ class AttendanceApiController extends Controller
         if ($existingCheckOut) {
             return response()->json([
                 'success' => false,
-                'message' => 'Anda sudah melakukan check-out hari ini.',
+                'message' => 'Anda sudah melakukan absen pulang hari ini.',
             ], 422);
         }
 
@@ -225,7 +225,7 @@ class AttendanceApiController extends Controller
         if (!$checkIn) {
             return response()->json([
                 'success' => false,
-                'message' => 'Anda belum melakukan check-in hari ini.',
+                'message' => 'Anda belum melakukan absen masuk hari ini.',
             ], 422);
         }
 
@@ -273,7 +273,7 @@ class AttendanceApiController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Check-out berhasil!',
+            'message' => 'Absen pulang berhasil!',
             'data' => [
                 'attendance_id' => $attendance->id,
                 'location_name' => $result['location']->name,

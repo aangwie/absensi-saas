@@ -176,6 +176,7 @@ class AuthController extends Controller
             'type' => $type,
             'school' => $user->school->name,
             'school_id' => $user->school_id,
+            'device_id' => $user->device_id,
         ];
 
         if ($type === 'student') {
