@@ -240,23 +240,7 @@ class LoginScreen extends StatelessWidget {
                         shadowColor: Colors.transparent,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       ),
-                      onPressed: () async {
-                        bool success;
-                        if (loginType.value == 'student') {
-                          success = await authController.loginAsStudent(
-                            idController.text,
-                            passwordController.text,
-                          );
-                        } else {
-                          success = await authController.loginAsTeacher(
-                            idController.text,
-                            passwordController.text,
-                          );
-                        }
-                        if (success) {
-                          Get.offAll(() => const HomeScreen());
-                        }
-                      },
+                      onPressed: () => _handleLogin(context),
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -288,6 +272,166 @@ class LoginScreen extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// Handle login process dengan device binding check
+  Future<void> _handleLogin(BuildContext context) async {
+    Map<String, dynamic> result;
+
+    if (loginType.value == 'student') {
+      result = await authController.loginAsStudent(
+        idController.text,
+        passwordController.text,
+      );
+    } else {
+      result = await authController.loginAsTeacher(
+        idController.text,
+        passwordController.text,
+      );
+    }
+
+    if (result['success'] == true) {
+      Get.offAll(() => const HomeScreen());
+    } else if (result['isDeviceMismatch'] == true) {
+      // Tampilkan dialog khusus device mismatch
+      if (context.mounted) {
+        _showDeviceMismatchDialog(context, result['message']);
+      }
+    } else {
+      // Tampilkan snackbar error biasa
+      Get.snackbar(
+        'Login Gagal',
+        result['message'] ?? 'Terjadi kesalahan.',
+        backgroundColor: Colors.red.shade50,
+        colorText: Colors.red.shade800,
+        icon: const Icon(Icons.error_outline, color: Colors.red),
+        snackPosition: SnackPosition.TOP,
+        duration: const Duration(seconds: 4),
+      );
+    }
+  }
+
+  /// Dialog khusus untuk device binding mismatch
+  void _showDeviceMismatchDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Container(
+          padding: const EdgeInsets.all(28),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            color: Colors.white,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Icon warning
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFD32F2F).withOpacity(0.1),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: const Color(0xFFD32F2F).withOpacity(0.3),
+                    width: 2,
+                  ),
+                ),
+                child: const Icon(
+                  Icons.phonelink_lock,
+                  color: Color(0xFFD32F2F),
+                  size: 36,
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Title
+              const Text(
+                'Perangkat Tidak Terdaftar',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFFD32F2F),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Message
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF3E0),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFFFCC80)),
+                ),
+                child: Column(
+                  children: [
+                    const Row(
+                      children: [
+                        Icon(Icons.info_outline, color: Color(0xFFE65100), size: 18),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'ID perangkat Anda tidak cocok dengan yang terdaftar di server.',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFFE65100),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        const Icon(Icons.support_agent, color: Color(0xFFE65100), size: 18),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Hubungi SuperAdmin untuk mereset perangkat.',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.orange.shade900,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              // OK button
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFD32F2F),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    elevation: 2,
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    'Kembali ke Login',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

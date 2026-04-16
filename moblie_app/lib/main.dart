@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'presentation/controllers/auth_controller.dart';
-import 'presentation/screens/login_screen.dart';
-import 'presentation/screens/home_screen.dart';
+import 'presentation/screens/security_check_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,14 +23,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: Obx(() {
-        final authController = Get.find<AuthController>();
-        if (authController.isLoggedIn.value) {
-          return const HomeScreen();
-        } else {
-          return LoginScreen();
-        }
-      }),
+      // SecurityCheckScreen melakukan pengecekan lokasi, GPS, mock location
+      // sebelum navigasi ke Login atau Home
+      home: const SecurityCheckScreen(),
     );
   }
 }

@@ -34,7 +34,8 @@ class AuthController extends GetxController {
   }
 
   /// Login sebagai Siswa menggunakan NISN
-  Future<bool> loginAsStudent(String nisn, String password) async {
+  /// Returns Map: {success: bool, message: String, isDeviceMismatch: bool}
+  Future<Map<String, dynamic>> loginAsStudent(String nisn, String password) async {
     isLoading.value = true;
     try {
       String deviceId = await deviceService.getDeviceId();
@@ -63,19 +64,19 @@ class AuthController extends GetxController {
         userName.value = user['name'];
         userSchool.value = user['school'];
         userId.value = user['id'].toString();
-        return true;
+        return {'success': true, 'message': 'Login berhasil', 'isDeviceMismatch': false};
       }
-      return false;
+      return {'success': false, 'message': 'Login gagal', 'isDeviceMismatch': false};
     } catch (e) {
-      _handleError(e);
-      return false;
+      return _handleLoginError(e);
     } finally {
       isLoading.value = false;
     }
   }
 
   /// Login sebagai Guru menggunakan NIP
-  Future<bool> loginAsTeacher(String nip, String password) async {
+  /// Returns Map: {success: bool, message: String, isDeviceMismatch: bool}
+  Future<Map<String, dynamic>> loginAsTeacher(String nip, String password) async {
     isLoading.value = true;
     try {
       String deviceId = await deviceService.getDeviceId();
@@ -104,12 +105,11 @@ class AuthController extends GetxController {
         userName.value = user['name'];
         userSchool.value = user['school'];
         userId.value = user['id'].toString();
-        return true;
+        return {'success': true, 'message': 'Login berhasil', 'isDeviceMismatch': false};
       }
-      return false;
+      return {'success': false, 'message': 'Login gagal', 'isDeviceMismatch': false};
     } catch (e) {
-      _handleError(e);
-      return false;
+      return _handleLoginError(e);
     } finally {
       isLoading.value = false;
     }
@@ -130,10 +130,15 @@ class AuthController extends GetxController {
     userId.value = '';
   }
 
-  void _handleError(dynamic e) {
+  /// Handle login errors dan deteksi device mismatch
+  Map<String, dynamic> _handleLoginError(dynamic e) {
     String message = 'Terjadi kesalahan.';
+    bool isDeviceMismatch = false;
+
     if (e is DioException && e.response != null) {
       final data = e.response?.data;
+      final statusCode = e.response?.statusCode;
+
       if (data is Map && data.containsKey('message')) {
         message = data['message'];
       } else if (data is Map && data.containsKey('errors')) {
@@ -142,9 +147,19 @@ class AuthController extends GetxController {
             ? (errors.values.first as List).first.toString()
             : errors.values.first.toString();
       }
+
+      // Deteksi device binding mismatch dari response 403
+      if (statusCode == 403 && message.toLowerCase().contains('perangkat lain')) {
+        isDeviceMismatch = true;
+      }
     } else {
       message = e.toString();
     }
-    Get.snackbar('Login Gagal', message);
+
+    return {
+      'success': false,
+      'message': message,
+      'isDeviceMismatch': isDeviceMismatch,
+    };
   }
 }
