@@ -294,13 +294,17 @@ class AttendanceController extends GetxController {
 
   void _handleError(dynamic e, String title) {
     String message = 'Terjadi kesalahan.';
-    if (e is DioException && e.response != null) {
-      final data = e.response?.data;
-      if (data is Map && data.containsKey('message')) {
-        message = data['message'];
+    try {
+      if (e is DioException && e.response != null) {
+        final data = e.response?.data;
+        if (data is Map && data.containsKey('message') && data['message'] != null) {
+          message = data['message'].toString();
+        }
+      } else {
+        message = e.toString();
       }
-    } else {
-      message = e.toString();
+    } catch (_) {
+      message = 'Terjadi kesalahan yang tidak diketahui.';
     }
     Get.snackbar(title, message);
   }

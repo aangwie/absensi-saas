@@ -4,6 +4,7 @@ import '../controllers/auth_controller.dart';
 import '../controllers/attendance_controller.dart';
 import 'attendance_screen.dart';
 import 'history_screen.dart';
+import 'status_screen.dart';
 import 'login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -21,7 +22,6 @@ class HomeScreenState extends State<HomeScreen> {
   /// Navigate to history tab and refresh it
   void goToHistory() {
     setState(() => _currentIndex = 1);
-    // Refresh history data
     Future.delayed(const Duration(milliseconds: 300), () {
       _historyKey.currentState?.fetchHistory();
     });
@@ -29,12 +29,10 @@ class HomeScreenState extends State<HomeScreen> {
 
   /// Refresh all data in the app
   void refreshAll() async {
-    // Refresh attendance controller data
     if (Get.isRegistered<AttendanceController>()) {
       final ctrl = Get.find<AttendanceController>();
       await ctrl.initData();
     }
-    // Refresh history if on history tab
     _historyKey.currentState?.fetchHistory();
 
     Get.snackbar(
@@ -53,6 +51,7 @@ class HomeScreenState extends State<HomeScreen> {
         children: [
           AttendanceScreen(),
           HistoryScreen(key: _historyKey),
+          const StatusScreen(),
         ],
       ),
       bottomNavigationBar: Container(
@@ -73,13 +72,12 @@ class HomeScreenState extends State<HomeScreen> {
           child: BottomNavigationBar(
             currentIndex: _currentIndex,
             onTap: (index) {
-              if (index == 3) {
+              if (index == 4) {
                 _showLogoutDialog();
-              } else if (index == 2) {
+              } else if (index == 3) {
                 refreshAll();
               } else {
                 setState(() => _currentIndex = index);
-                // Auto-refresh history when switching to history tab
                 if (index == 1) {
                   Future.delayed(const Duration(milliseconds: 200), () {
                     _historyKey.currentState?.fetchHistory();
@@ -90,8 +88,8 @@ class HomeScreenState extends State<HomeScreen> {
             type: BottomNavigationBarType.fixed,
             selectedItemColor: Colors.blue.shade700,
             unselectedItemColor: Colors.grey,
-            selectedFontSize: 12,
-            unselectedFontSize: 12,
+            selectedFontSize: 11,
+            unselectedFontSize: 11,
             items: const [
               BottomNavigationBarItem(
                 icon: Icon(Icons.location_on),
@@ -102,6 +100,11 @@ class HomeScreenState extends State<HomeScreen> {
                 icon: Icon(Icons.history),
                 activeIcon: Icon(Icons.history, size: 28),
                 label: 'Riwayat',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.phone_android),
+                activeIcon: Icon(Icons.phone_android, size: 28),
+                label: 'Status',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.refresh, color: Colors.green),
