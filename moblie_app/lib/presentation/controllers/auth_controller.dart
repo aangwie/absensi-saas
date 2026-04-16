@@ -149,7 +149,11 @@ class AuthController extends GetxController {
       }
 
       // Deteksi device binding mismatch dari response 403
-      if (statusCode == 403 && message.toLowerCase().contains('perangkat lain')) {
+      // Kasus 1: Akun sudah terikat di perangkat lain
+      // Kasus 2: Perangkat sudah terdaftar pada akun lain
+      if (statusCode == 403 &&
+          (message.toLowerCase().contains('perangkat lain') ||
+           message.toLowerCase().contains('akun lain'))) {
         isDeviceMismatch = true;
       }
     } else {
