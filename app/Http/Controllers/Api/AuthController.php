@@ -19,7 +19,7 @@ class AuthController extends Controller
         $request->validate([
             'nisn' => 'required|string',
             'password' => 'required|string',
-            'device_id' => 'nullable|string',
+            'device_id' => 'required|string',
         ]);
 
         $student = Student::where('nisn', $request->nisn)->first();
@@ -44,8 +44,16 @@ class AuthController extends Controller
             ], 403);
         }
 
-        // Update device_id if provided
-        if ($request->device_id) {
+        // Device binding check
+        if ($student->device_id && $student->device_id !== $request->device_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akun ini sudah terdaftar di perangkat lain. Hubungi admin untuk mereset perangkat.',
+            ], 403);
+        }
+
+        // Bind device if first login
+        if (!$student->device_id) {
             $student->update(['device_id' => $request->device_id]);
         }
 
@@ -80,7 +88,7 @@ class AuthController extends Controller
         $request->validate([
             'nip' => 'required|string',
             'password' => 'required|string',
-            'device_id' => 'nullable|string',
+            'device_id' => 'required|string',
         ]);
 
         $teacher = Teacher::where('nip', $request->nip)->first();
@@ -105,8 +113,16 @@ class AuthController extends Controller
             ], 403);
         }
 
-        // Update device_id if provided
-        if ($request->device_id) {
+        // Device binding check
+        if ($teacher->device_id && $teacher->device_id !== $request->device_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akun ini sudah terdaftar di perangkat lain. Hubungi admin untuk mereset perangkat.',
+            ], 403);
+        }
+
+        // Bind device if first login
+        if (!$teacher->device_id) {
             $teacher->update(['device_id' => $request->device_id]);
         }
 

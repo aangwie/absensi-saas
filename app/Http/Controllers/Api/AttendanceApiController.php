@@ -296,6 +296,30 @@ class AttendanceApiController extends Controller
             ->orderBy('checked_at', 'desc')
             ->paginate(20);
 
+        // Manually map to ensure formatted dates appear in JSON
+        $attendances->getCollection()->transform(function ($item) {
+            $checkedAt = Carbon::parse($item->checked_at)->timezone('Asia/Jakarta');
+            return [
+                'id' => $item->id,
+                'type' => $item->type,
+                'status' => $item->status,
+                'latitude' => $item->latitude,
+                'longitude' => $item->longitude,
+                'distance_meters' => $item->distance_meters,
+                'accuracy' => $item->accuracy,
+                'checked_at' => $checkedAt->format('Y-m-d H:i:s'),
+                'checked_at_formatted' => $checkedAt->format('d/m/Y H:i:s'),
+                'checked_at_date' => $checkedAt->format('d/m/Y'),
+                'checked_at_time' => $checkedAt->format('H:i'),
+                'timezone' => 'WIB',
+                'location' => $item->location ? [
+                    'id' => $item->location->id,
+                    'name' => $item->location->name,
+                    'radius_max' => $item->location->radius_max,
+                ] : null,
+            ];
+        });
+
         return response()->json([
             'success' => true,
             'data' => $attendances,

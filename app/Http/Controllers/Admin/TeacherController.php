@@ -154,4 +154,20 @@ class TeacherController extends Controller
 
         return back()->with('success', 'Pendaftaran guru ditolak.');
     }
+
+    /**
+     * Clear device binding for a teacher (allow new device)
+     */
+    public function clearDevice(Request $request, Teacher $teacher)
+    {
+        $user = $request->user();
+        if (!$user->isSuperAdmin() && $teacher->school_id != $user->school_id) {
+            abort(403, 'Anda tidak berhak mereset perangkat guru ini.');
+        }
+
+        $teacher->update(['device_id' => null]);
+        $teacher->tokens()->delete();
+
+        return back()->with('success', "Perangkat guru {$teacher->name} berhasil direset. Guru dapat login dari perangkat baru.");
+    }
 }

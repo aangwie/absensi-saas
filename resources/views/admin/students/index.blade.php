@@ -40,6 +40,7 @@
                         @endif
                         <th class="text-center py-3 px-3 text-xs font-semibold text-slate-500 uppercase">Verifikasi</th>
                         <th class="text-center py-3 px-3 text-xs font-semibold text-slate-500 uppercase">Status</th>
+                        <th class="text-center py-3 px-3 text-xs font-semibold text-slate-500 uppercase">Perangkat</th>
                         <th class="text-center py-3 px-3 text-xs font-semibold text-slate-500 uppercase">Aksi</th>
                     </tr>
                 </thead>
@@ -67,6 +68,13 @@
                                 {{ $student->is_active ? 'Aktif' : 'Nonaktif' }}
                             </span>
                         </td>
+                        <td class="py-3 px-3 text-center">
+                            @if($student->device_id)
+                                <span class="inline-flex px-2 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700" title="{{ $student->device_id }}">Terikat</span>
+                            @else
+                                <span class="inline-flex px-2 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500">Belum</span>
+                            @endif
+                        </td>
                         <td class="py-3 px-3">
                             <div class="flex items-center justify-center gap-1">
                                 @if((auth()->user()->isAdmin() || auth()->user()->isSuperAdmin()) && $student->verification_status !== 'verified')
@@ -80,9 +88,15 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                 </a>
                                 <form id="delete-student-{{ $student->id }}" method="POST" action="{{ route('admin.students.destroy', $student) }}">@csrf @method('DELETE')</form>
-                                <button onclick="confirmDelete('delete-student-{{ $student->id }}', '{{ $student->name }}')" class="p-2 rounded-lg text-slate-500 hover:bg-red-50 hover:text-red-600 transition-colors">
+                                <button onclick="confirmDelete('delete-student-{{ $student->id }}', '{{ $student->name }}')" class="p-2 rounded-lg text-slate-500 hover:bg-red-50 hover:text-red-600 transition-colors" title="Hapus">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                 </button>
+                                @if($student->device_id)
+                                    <form id="clear-device-student-{{ $student->id }}" method="POST" action="{{ route('admin.students.clearDevice', $student) }}">@csrf</form>
+                                    <button onclick="if(confirm('Reset perangkat {{ $student->name }}? Siswa akan bisa login dari perangkat baru.')) document.getElementById('clear-device-student-{{ $student->id }}').submit()" class="p-2 rounded-lg text-slate-500 hover:bg-amber-50 hover:text-amber-600 transition-colors" title="Reset Perangkat">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                                    </button>
+                                @endif
                             </div>
                         </td>
                     </tr>

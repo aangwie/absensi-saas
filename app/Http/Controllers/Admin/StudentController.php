@@ -152,4 +152,20 @@ class StudentController extends Controller
 
         return back()->with('success', 'Pendaftaran siswa ditolak.');
     }
+
+    /**
+     * Clear device binding for a student (allow new device)
+     */
+    public function clearDevice(Request $request, Student $student)
+    {
+        $user = $request->user();
+        if (!$user->isSuperAdmin() && $student->school_id != $user->school_id) {
+            abort(403, 'Anda tidak berhak mereset perangkat siswa ini.');
+        }
+
+        $student->update(['device_id' => null]);
+        $student->tokens()->delete(); // Also revoke tokens
+
+        return back()->with('success', "Perangkat siswa {$student->name} berhasil direset. Siswa dapat login dari perangkat baru.");
+    }
 }
