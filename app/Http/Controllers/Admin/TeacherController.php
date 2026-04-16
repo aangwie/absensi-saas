@@ -54,6 +54,12 @@ class TeacherController extends Controller
         $school = School::findOrFail($validated['school_id']);
         $validated['password'] = Hash::make($school->npsn);
 
+        if ($user->isSuperAdmin()) {
+            $validated['verification_status'] = 'verified';
+            $validated['verified_by'] = $user->id;
+            $validated['verified_at'] = now();
+        }
+
         Teacher::create($validated);
 
         return redirect()->route('admin.teachers.index')
@@ -115,5 +121,37 @@ class TeacherController extends Controller
         $teacher->delete();
         return redirect()->route('admin.teachers.index')
             ->with('success', 'Guru berhasil dihapus!');
+    }
+
+    public function verify(Request $request, Teacher $teacher)
+    {
+        $user = $request->user();
+        if (!$user->isSuperAdmin()) {
+            abort(403, 'Hanya SuperAdmin yang dapat memverifikasi guru.');
+        }
+
+        $teacher->update([
+            'verification_status' => 'verified',
+            'verified_by' => $user->id,
+            'verified_at' => now(),
+        ]);
+
+        return back()->with('success', 'Guru berhasil diverifikasi.');
+    }
+
+    public function reject(Request $request, Teacher $teacher)
+    {
+        $user = $request->user();
+        if (!$user->isSuperAdmin()) {
+            abort(403, 'Hanya SuperAdmin yang dapat menolak guru.');
+        }
+
+        $teacher->update([
+            'verification_status' => 'rejected',
+            'verified_by' => $user->id,
+            'verified_at' => now(),
+        ]);
+
+        return back()->with('success', 'Pendaftaran guru ditolak.');
     }
 }

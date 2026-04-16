@@ -20,6 +20,9 @@ class Student extends Authenticatable
         'password',
         'device_id',
         'is_active',
+        'verification_status',
+        'verified_by',
+        'verified_at',
     ];
 
     protected $hidden = [
@@ -29,6 +32,7 @@ class Student extends Authenticatable
     protected $casts = [
         'is_active' => 'boolean',
         'password' => 'hashed',
+        'verified_at' => 'datetime',
     ];
 
     public function school(): BelongsTo
@@ -44,5 +48,10 @@ class Student extends Authenticatable
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    public function verifiedByUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by');
     }
 }

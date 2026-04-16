@@ -37,6 +37,13 @@ class AuthController extends Controller
             ], 403);
         }
 
+        if ($student->verification_status !== 'verified') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akun siswa belum diverifikasi oleh Admin Sekolah.',
+            ], 403);
+        }
+
         // Update device_id if provided
         if ($request->device_id) {
             $student->update(['device_id' => $request->device_id]);
@@ -88,6 +95,13 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Akun guru tidak aktif. Hubungi admin sekolah.',
+            ], 403);
+        }
+
+        if ($teacher->verification_status !== 'verified') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akun guru belum diverifikasi oleh Super Admin.',
             ], 403);
         }
 

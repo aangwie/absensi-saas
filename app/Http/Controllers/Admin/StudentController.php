@@ -53,6 +53,12 @@ class StudentController extends Controller
         $school = School::findOrFail($validated['school_id']);
         $validated['password'] = Hash::make($school->npsn);
 
+        if ($user->isAdmin() || $user->isSuperAdmin()) {
+            $validated['verification_status'] = 'verified';
+            $validated['verified_by'] = $user->id;
+            $validated['verified_at'] = now();
+        }
+
         Student::create($validated);
 
         return redirect()->route('admin.students.index')
@@ -113,5 +119,37 @@ class StudentController extends Controller
         $student->delete();
         return redirect()->route('admin.students.index')
             ->with('success', 'Siswa berhasil dihapus!');
+    }
+
+    public function verify(Request $request, Student $student)
+    {
+        $user = $request->user();
+        if (!$user->isSuperAdmin() && $student->school_id != $user->school_id) {
+            abort(403, 'Anda tidak berhak memverifikasi siswa ini.');
+        }
+
+        $student->update([
+            'verification_status' => 'verified',
+            'verified_by' => $user->id,
+            'verified_at' => now(),
+        ]);
+
+        return back()->with('success', 'Siswa berhasil diverifikasi.');
+    }
+
+    public function reject(Request $request, Student $student)
+    {
+        $user = $request->user();
+        if (!$user->isSuperAdmin() && $student->school_id != $user->school_id) {
+            abort(403, 'Anda tidak berhak menolak siswa ini.');
+        }
+
+        $student->update([
+            'verification_status' => 'rejected',
+            'verified_by' => $user->id,
+            'verified_at' => now(),
+        ]);
+
+        return back()->with('success', 'Pendaftaran siswa ditolak.');
     }
 }

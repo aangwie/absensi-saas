@@ -15,10 +15,16 @@
         </a>
     </div>
     <div class="p-5">
-        <form method="GET" class="mb-4">
+        <form method="GET" class="mb-4" id="search-form">
             <div class="relative max-w-sm">
                 <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama atau NISN..." class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                <input type="text" name="search" value="{{ request('search') }}" 
+                       x-data
+                       @input.debounce.500ms="$el.form.submit()"
+                       autofocus
+                       onfocus="var temp_value=this.value; this.value=''; this.value=temp_value"
+                       placeholder="Cari nama atau NISN..." 
+                       class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
             </div>
         </form>
         <div class="overflow-x-auto">
@@ -32,6 +38,7 @@
                         @if(auth()->user()->isSuperAdmin())
                         <th class="text-left py-3 px-3 text-xs font-semibold text-slate-500 uppercase">Sekolah</th>
                         @endif
+                        <th class="text-center py-3 px-3 text-xs font-semibold text-slate-500 uppercase">Verifikasi</th>
                         <th class="text-center py-3 px-3 text-xs font-semibold text-slate-500 uppercase">Status</th>
                         <th class="text-center py-3 px-3 text-xs font-semibold text-slate-500 uppercase">Aksi</th>
                     </tr>
@@ -47,12 +54,28 @@
                         <td class="py-3 px-3 text-slate-600">{{ $student->school->name }}</td>
                         @endif
                         <td class="py-3 px-3 text-center">
+                            @if($student->verification_status === 'verified')
+                                <span class="inline-flex px-2 py-1 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700" title="Diverifikasi oleh: {{ $student->verifiedByUser?->name }}">Verified</span>
+                            @elseif($student->verification_status === 'pending')
+                                <span class="inline-flex px-2 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">Pending</span>
+                            @else
+                                <span class="inline-flex px-2 py-1 rounded-full text-[10px] font-bold bg-red-100 text-red-700">Rejected</span>
+                            @endif
+                        </td>
+                        <td class="py-3 px-3 text-center">
                             <span class="inline-flex px-2 py-1 rounded-full text-[10px] font-bold {{ $student->is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }}">
                                 {{ $student->is_active ? 'Aktif' : 'Nonaktif' }}
                             </span>
                         </td>
                         <td class="py-3 px-3">
                             <div class="flex items-center justify-center gap-1">
+                                @if((auth()->user()->isAdmin() || auth()->user()->isSuperAdmin()) && $student->verification_status !== 'verified')
+                                    <form id="verify-student-{{ $student->id }}" method="POST" action="{{ route('admin.students.verify', $student) }}">@csrf</form>
+                                    <button onclick="document.getElementById('verify-student-{{ $student->id }}').submit()" class="p-2 rounded-lg text-emerald-500 hover:bg-emerald-50 hover:text-emerald-600 transition-colors" title="Verifikasi">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    </button>
+                                @endif
+
                                 <a href="{{ route('admin.students.edit', $student) }}" class="p-2 rounded-lg text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                 </a>
@@ -64,7 +87,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="7" class="py-12 text-center text-slate-400">Belum ada data siswa</td></tr>
+                    <tr><td colspan="8" class="py-12 text-center text-slate-400">Belum ada data siswa</td></tr>
                     @endforelse
                 </tbody>
             </table>

@@ -50,6 +50,10 @@ class MobileController extends Controller
                 return back()->withErrors(['identifier' => 'Akun siswa tidak aktif. Hubungi admin sekolah.'])->withInput();
             }
 
+            if ($user->verification_status !== 'verified') {
+                return back()->withErrors(['identifier' => 'Akun siswa belum diverifikasi oleh Admin Sekolah.'])->withInput();
+            }
+
             // Revoke previous tokens and create new one
             $user->tokens()->delete();
             $token = $user->createToken('mobile-student-token')->plainTextToken;
@@ -76,6 +80,10 @@ class MobileController extends Controller
 
             if (!$user->is_active) {
                 return back()->withErrors(['identifier' => 'Akun guru tidak aktif. Hubungi admin sekolah.'])->withInput();
+            }
+
+            if ($user->verification_status !== 'verified') {
+                return back()->withErrors(['identifier' => 'Akun guru belum diverifikasi oleh Super Admin.'])->withInput();
             }
 
             // Revoke previous tokens and create new one

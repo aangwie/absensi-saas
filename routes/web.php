@@ -53,9 +53,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'tenant'])->group(fu
 
     // Students
     Route::resource('students', StudentController::class);
+    Route::post('students/{student}/verify', [StudentController::class, 'verify'])->name('students.verify');
+    Route::post('students/{student}/reject', [StudentController::class, 'reject'])->name('students.reject');
 
     // Teachers
     Route::resource('teachers', TeacherController::class);
+    Route::post('teachers/{teacher}/verify', [TeacherController::class, 'verify'])->name('teachers.verify');
+    Route::post('teachers/{teacher}/reject', [TeacherController::class, 'reject'])->name('teachers.reject');
 
     // Attendances
     Route::get('attendances', [AttendanceController::class, 'index'])->name('attendances.index');

@@ -42,6 +42,16 @@
                         <span class="text-sm text-slate-700">Reset Password</span>
                     </label>
                 </div>
+                <div class="sm:col-span-2 pt-2">
+                    <p class="text-sm text-slate-600">Status Verifikasi: 
+                        <span class="font-bold {{ $teacher->verification_status === 'verified' ? 'text-blue-600' : ($teacher->verification_status === 'pending' ? 'text-amber-600' : 'text-red-600') }}">
+                            {{ ucfirst($teacher->verification_status) }}
+                        </span>
+                        @if($teacher->verifiedByUser)
+                         oleh {{ $teacher->verifiedByUser->name }} pada {{ \Carbon\Carbon::parse($teacher->verified_at)->format('d M Y H:i') }}
+                        @endif
+                    </p>
+                </div>
             </div>
             <div class="flex items-center gap-3 pt-4 border-t border-slate-200">
                 <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-semibold shadow-lg shadow-indigo-500/30 hover:shadow-xl transition-all">Perbarui</button>

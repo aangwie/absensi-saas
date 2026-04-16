@@ -31,6 +31,7 @@ class StudentSeeder extends Seeder
                     'class' => $data['class'],
                     'password' => Hash::make($school1->npsn), // Default password = NPSN
                     'is_active' => true,
+                    'verification_status' => 'verified',
                 ]);
             }
         }
@@ -50,6 +51,7 @@ class StudentSeeder extends Seeder
                     'class' => $data['class'],
                     'password' => Hash::make($school2->npsn),
                     'is_active' => true,
+                    'verification_status' => 'verified',
                 ]);
             }
         }
