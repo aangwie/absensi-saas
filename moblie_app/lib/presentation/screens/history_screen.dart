@@ -157,23 +157,14 @@ class HistoryScreenState extends State<HistoryScreen> {
   Widget _buildHistoryCard(Map<String, dynamic> item) {
     final bool isCheckIn = item['type'] == 'check_in';
     final String status = item['status'] ?? '';
-    final String checkedAt = item['checked_at'] ?? '';
     final double distance = (item['distance_meters'] as num?)?.toDouble() ?? 0;
     final String locationName = item['location']?['name'] ?? '-';
-    final double radius = (item['location']?['radius'] as num?)?.toDouble() ?? 80;
+    final double radius = (item['location']?['radius_max'] as num?)?.toDouble() ?? 80;
 
-    // Parse date
-    DateTime? dateTime;
-    try {
-      dateTime = DateTime.parse(checkedAt);
-    } catch (_) {}
-
-    final String formattedDate = dateTime != null
-        ? DateFormat('dd/MM/yyyy').format(dateTime)
-        : '-';
-    final String formattedTime = dateTime != null
-        ? DateFormat('HH:mm').format(dateTime)
-        : '-';
+    // Use server-formatted dates (already in WIB/GMT+7)
+    final String formattedDate = item['checked_at_date'] ?? '-';
+    final String formattedTime = item['checked_at_time'] ?? '-';
+    final String timezone = item['timezone'] ?? 'WIB';
 
     Color statusColor;
     String statusLabel;
@@ -298,7 +289,7 @@ class HistoryScreenState extends State<HistoryScreen> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  formattedDate,
+                  '$formattedDate $timezone',
                   style: TextStyle(
                     fontSize: 11,
                     color: Colors.grey.shade500,
