@@ -54,6 +54,19 @@ class AuthController extends Controller
 
         // Bind device if first login
         if (!$student->device_id) {
+            // Cek apakah device_id sudah digunakan oleh akun lain (student atau teacher)
+            $deviceUsedByStudent = Student::where('device_id', $request->device_id)
+                ->where('id', '!=', $student->id)
+                ->exists();
+            $deviceUsedByTeacher = Teacher::where('device_id', $request->device_id)->exists();
+
+            if ($deviceUsedByStudent || $deviceUsedByTeacher) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Perangkat ini sudah terdaftar pada akun lain. Satu perangkat hanya bisa digunakan untuk satu akun. Hubungi SuperAdmin untuk reset.',
+                ], 403);
+            }
+
             $student->update(['device_id' => $request->device_id]);
         }
 
@@ -123,6 +136,19 @@ class AuthController extends Controller
 
         // Bind device if first login
         if (!$teacher->device_id) {
+            // Cek apakah device_id sudah digunakan oleh akun lain (student atau teacher)
+            $deviceUsedByStudent = Student::where('device_id', $request->device_id)->exists();
+            $deviceUsedByTeacher = Teacher::where('device_id', $request->device_id)
+                ->where('id', '!=', $teacher->id)
+                ->exists();
+
+            if ($deviceUsedByStudent || $deviceUsedByTeacher) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Perangkat ini sudah terdaftar pada akun lain. Satu perangkat hanya bisa digunakan untuk satu akun. Hubungi SuperAdmin untuk reset.',
+                ], 403);
+            }
+
             $teacher->update(['device_id' => $request->device_id]);
         }
 
