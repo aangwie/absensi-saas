@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login — Absensi Multi-SaaS</title>
+    <title>Login — {{ \App\Models\Setting::getValue('website_name', 'Absensi Multi-SaaS') }}</title>
+    @php
+        $websiteLogo = \App\Models\Setting::getValue('website_logo_base64', '');
+    @endphp
+    @if($websiteLogo)
+        <link rel="icon" type="image/x-icon" href="{{ $websiteLogo }}">
+    @endif
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])

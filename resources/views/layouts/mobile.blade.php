@@ -10,6 +10,12 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="description" content="Absensi Digital — Check-in dan Check-out via browser mobile">
     <title>@yield('title', 'Absensi Mobile')</title>
+    @php
+        $websiteLogo = \App\Models\Setting::getValue('website_logo_base64', '');
+    @endphp
+    @if($websiteLogo)
+        <link rel="icon" type="image/x-icon" href="{{ $websiteLogo }}">
+    @endif
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
