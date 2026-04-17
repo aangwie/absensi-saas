@@ -6,16 +6,26 @@
     <div class="h-full flex flex-col bg-gradient-to-b from-slate-900 via-slate-800 to-indigo-900 text-white shadow-2xl">
 
         {{-- Logo Header --}}
+        @php
+            $websiteName = \App\Models\Setting::getValue('website_name', 'Absensi');
+            $websiteLogo = \App\Models\Setting::getValue('website_logo_base64', '');
+        @endphp
         <div class="flex items-center gap-3 px-4 h-16 border-b border-white/10">
-            <div
-                class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/30">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                </svg>
-            </div>
+            @if($websiteLogo)
+                <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0 shadow-lg p-1">
+                    <img src="{{ $websiteLogo }}" alt="Logo" class="w-full h-full object-contain rounded-lg">
+                </div>
+            @else
+                <div
+                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/30">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                </div>
+            @endif
             <div x-show="sidebarOpen" x-transition class="overflow-hidden">
-                <h1 class="font-bold text-sm leading-tight">Absensi</h1>
+                <h1 class="font-bold text-sm leading-tight">{{ $websiteName }}</h1>
                 <p class="text-[10px] text-indigo-300">Multi-SaaS Platform</p>
             </div>
         </div>
@@ -140,6 +150,17 @@
                 <div class="pt-3 pb-1 px-3" x-show="sidebarOpen">
                     <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Sistem</p>
                 </div>
+
+                {{-- Website Settings --}}
+                <a href="{{ route('admin.website-settings.index') }}"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
+                                      {{ request()->routeIs('admin.website-settings.*') ? 'bg-white/15 text-white shadow-lg' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <span x-show="sidebarOpen" x-transition class="text-sm font-medium">Pengaturan Website</span>
+                </a>
 
                 {{-- Settings --}}
                 <a href="{{ route('admin.settings.index') }}"

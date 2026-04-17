@@ -81,6 +81,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'tenant'])->group(fu
         Route::post('/migrate', [SettingController::class, 'migrate'])->name('migrate');
     });
 
+    // Website Settings (super_admin only)
+    Route::prefix('website-settings')->name('website-settings.')->middleware('role:super_admin')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\WebsiteSettingController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\Admin\WebsiteSettingController::class, 'update'])->name('update');
+    });
+
     // Attendance Schedule (super_admin only)
     Route::prefix('attendance-schedule')->name('attendance-schedule.')->middleware('role:super_admin')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\AttendanceScheduleController::class, 'index'])->name('index');
