@@ -95,6 +95,9 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                 </button>
                                 @if($teacher->device_id)
+                                    <button onclick="showDeviceDetail('{{ addslashes($teacher->device_name ?? 'Tidak diketahui') }}', '{{ addslashes($teacher->device_version ?? 'Tidak diketahui') }}', '{{ addslashes($teacher->device_id) }}')" class="p-2 rounded-lg text-slate-500 hover:bg-blue-50 hover:text-blue-600 transition-colors" title="Detail Perangkat">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    </button>
                                     <form id="clear-device-teacher-{{ $teacher->id }}" method="POST" action="{{ route('admin.teachers.clearDevice', $teacher) }}">@csrf</form>
                                     <button onclick="if(confirm('Reset perangkat {{ $teacher->name }}? Guru akan bisa login dari perangkat baru.')) document.getElementById('clear-device-teacher-{{ $teacher->id }}').submit()" class="p-2 rounded-lg text-slate-500 hover:bg-amber-50 hover:text-amber-600 transition-colors" title="Reset Perangkat">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
@@ -113,3 +116,27 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    function showDeviceDetail(name, version, id) {
+        Swal.fire({
+            title: 'Detail Perangkat',
+            html: `
+                <div class="text-left mt-4 text-sm text-slate-600">
+                    <p class="mb-2"><strong class="text-slate-800">Nama Perangkat:</strong><br/> ${name}</p>
+                    <p class="mb-2"><strong class="text-slate-800">Versi OS:</strong><br/> ${version}</p>
+                    <p class="mb-2"><strong class="text-slate-800">Device ID:</strong><br/> <span class="font-mono text-xs text-indigo-600">${id}</span></p>
+                </div>
+            `,
+            icon: 'info',
+            confirmButtonText: 'Tutup',
+            confirmButtonColor: '#4f46e5',
+            customClass: {
+                popup: 'rounded-2xl',
+                confirmButton: 'rounded-xl px-6',
+            }
+        });
+    }
+</script>
+@endpush

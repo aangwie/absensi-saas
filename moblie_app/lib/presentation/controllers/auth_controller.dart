@@ -38,12 +38,14 @@ class AuthController extends GetxController {
   Future<Map<String, dynamic>> loginAsStudent(String nisn, String password) async {
     isLoading.value = true;
     try {
-      String deviceId = await deviceService.getDeviceId();
+      Map<String, String> deviceInfo = await deviceService.getDeviceInfo();
 
       var response = await apiClient.client.post('/auth/student/login', data: {
         'nisn': nisn,
         'password': password,
-        'device_id': deviceId,
+        'device_id': deviceInfo['device_id'],
+        'device_name': deviceInfo['device_name'],
+        'device_version': deviceInfo['device_version'],
       });
 
       if (response.statusCode == 200 && response.data['success'] == true) {
@@ -79,12 +81,14 @@ class AuthController extends GetxController {
   Future<Map<String, dynamic>> loginAsTeacher(String nip, String password) async {
     isLoading.value = true;
     try {
-      String deviceId = await deviceService.getDeviceId();
+      Map<String, String> deviceInfo = await deviceService.getDeviceInfo();
 
       var response = await apiClient.client.post('/auth/teacher/login', data: {
         'nip': nip,
         'password': password,
-        'device_id': deviceId,
+        'device_id': deviceInfo['device_id'],
+        'device_name': deviceInfo['device_name'],
+        'device_version': deviceInfo['device_version'],
       });
 
       if (response.statusCode == 200 && response.data['success'] == true) {

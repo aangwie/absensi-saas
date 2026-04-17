@@ -165,7 +165,11 @@ class TeacherController extends Controller
             abort(403, 'Anda tidak berhak mereset perangkat guru ini.');
         }
 
-        $teacher->update(['device_id' => null]);
+        $teacher->update([
+            'device_id' => null,
+            'device_name' => null,
+            'device_version' => null,
+        ]);
         $teacher->tokens()->delete();
 
         return back()->with('success', "Perangkat guru {$teacher->name} berhasil direset. Guru dapat login dari perangkat baru.");

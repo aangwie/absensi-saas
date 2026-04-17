@@ -163,7 +163,11 @@ class StudentController extends Controller
             abort(403, 'Anda tidak berhak mereset perangkat siswa ini.');
         }
 
-        $student->update(['device_id' => null]);
+        $student->update([
+            'device_id' => null,
+            'device_name' => null,
+            'device_version' => null,
+        ]);
         $student->tokens()->delete(); // Also revoke tokens
 
         return back()->with('success', "Perangkat siswa {$student->name} berhasil direset. Siswa dapat login dari perangkat baru.");

@@ -19,6 +19,8 @@ class Teacher extends Authenticatable
         'phone',
         'password',
         'device_id',
+        'device_name',
+        'device_version',
         'is_active',
         'verification_status',
         'verified_by',

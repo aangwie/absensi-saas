@@ -19,6 +19,8 @@ class Student extends Authenticatable
         'class',
         'password',
         'device_id',
+        'device_name',
+        'device_version',
         'is_active',
         'verification_status',
         'verified_by',

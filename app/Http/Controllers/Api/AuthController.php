@@ -20,6 +20,8 @@ class AuthController extends Controller
             'nisn' => 'required|string',
             'password' => 'required|string',
             'device_id' => 'required|string',
+            'device_name' => 'nullable|string',
+            'device_version' => 'nullable|string',
         ]);
 
         $student = Student::where('nisn', $request->nisn)->first();
@@ -67,7 +69,11 @@ class AuthController extends Controller
                 ], 403);
             }
 
-            $student->update(['device_id' => $request->device_id]);
+            $student->update([
+                'device_id' => $request->device_id,
+                'device_name' => $request->device_name,
+                'device_version' => $request->device_version,
+            ]);
         }
 
         // Revoke previous tokens
@@ -102,6 +108,8 @@ class AuthController extends Controller
             'nip' => 'required|string',
             'password' => 'required|string',
             'device_id' => 'required|string',
+            'device_name' => 'nullable|string',
+            'device_version' => 'nullable|string',
         ]);
 
         $teacher = Teacher::where('nip', $request->nip)->first();
@@ -149,7 +157,11 @@ class AuthController extends Controller
                 ], 403);
             }
 
-            $teacher->update(['device_id' => $request->device_id]);
+            $teacher->update([
+                'device_id' => $request->device_id,
+                'device_name' => $request->device_name,
+                'device_version' => $request->device_version,
+            ]);
         }
 
         // Revoke previous tokens
