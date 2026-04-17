@@ -144,7 +144,7 @@
                             </svg>
                             Jika waktu tidak diisi, absensi tidak akan dibatasi waktu untuk hari tersebut.
                         </p>
-                        <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-500/20 transition-all duration-200 active:scale-[0.98]">
+                        <button type="submit" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-semibold shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all">
                             💾 Simpan Jadwal
                         </button>
                     </div>
